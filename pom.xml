@@ -31,7 +31,7 @@
   <properties>
     <jdk.version.minimum>11</jdk.version.minimum>
     <jetty.git.repo>jetty-test-helper</jetty.git.repo>
-    <junit.version>5.12.2</junit.version>
+    <junit.version>5.13.2</junit.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencyManagement>
