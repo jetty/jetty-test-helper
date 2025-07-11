@@ -18,7 +18,9 @@ import java.io.OutputStream;
 
 /**
  * Do nothing OutputStream implementation
+ * @deprecated use the JVM provided {@link OutputStream#nullOutputStream()} instead
  */
+@Deprecated(since = "6.4", forRemoval = true)
 class NoOpOutputStream extends OutputStream
 {
     @Override
