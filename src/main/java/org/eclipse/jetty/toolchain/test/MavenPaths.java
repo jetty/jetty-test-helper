@@ -27,10 +27,14 @@ import java.util.Objects;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.platform.commons.util.StringUtils;
 
 import static org.eclipse.jetty.toolchain.test.PathMatchers.isDirectory;
 import static org.eclipse.jetty.toolchain.test.PathMatchers.isRegularFile;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Simpler replacement for {@link MavenTestingUtils} used to find paths within the Maven <code>${project.basedir}</code>
@@ -68,6 +72,47 @@ public final class MavenPaths
         }
 
         return basePath;
+    }
+
+    private static void assertAcceptablePathName(String pathname)
+    {
+        assertNotNull(pathname, "Path name must not be null");
+        assertTrue(StringUtils.isNotBlank(pathname), "Path name must not be blank");
+        assertNotEquals('/', pathname.charAt(0), "Path name must not start with slashS");
+    }
+
+    /**
+     * <p>
+     * Get an expected file in the project.
+     * </p>
+     *
+     * @param pathname the name of the file (must not start with {@code /}. use only URI path separator syntax)
+     * @return the Path (always a file)
+     * @throws AssertionError if pathname does not exist, or resulting path is not a file
+     */
+    public static Path projectFile(String pathname)
+    {
+        assertAcceptablePathName(pathname);
+        Path path = projectBase().resolve(pathname);
+        assertThat("Project File: " + path, path, isRegularFile());
+        return path;
+    }
+
+    /**
+     * <p>
+     * Get an expected directory in the project.
+     * </p>
+     *
+     * @param pathname the name of the directory (must not start with {@code /}. use only URI path separator syntax)
+     * @return the Path (always a directory)
+     * @throws AssertionError if pathname does not exist, or resulting path is not a directory
+     */
+    public static Path projectDir(String pathname)
+    {
+        assertAcceptablePathName(pathname);
+        Path path = projectBase().resolve(pathname);
+        assertThat("Project Dir: " + path, path, isDirectory());
+        return path;
     }
 
     /**
@@ -167,6 +212,7 @@ public final class MavenPaths
      */
     public static Path targetTestDir(String name)
     {
+        assertAcceptablePathName(name);
         Path path = targetTests().resolve(name);
         // ensure that if it exists, it's a directory
         if (Files.exists(path))
@@ -344,7 +390,7 @@ public final class MavenPaths
         }
         catch (IOException e)
         {
-            // if toRealPath() fails, fallback to as detected version.
+            // if toRealPath() fails, usually because path doesn't exist, fallback to calculated version.
             result = path.toAbsolutePath();
         }
         return result;
@@ -352,6 +398,7 @@ public final class MavenPaths
 
     private static Path findMainResource(String name)
     {
+        assertAcceptablePathName(name);
         Path srcMainPath = projectBase().resolve("src/main/resources/" + name);
         if (Files.exists(srcMainPath))
         {
@@ -369,6 +416,7 @@ public final class MavenPaths
 
     private static Path findTestResource(String name)
     {
+        assertAcceptablePathName(name);
         Path srcMainPath = projectBase().resolve("src/test/resources/" + name);
         if (Files.exists(srcMainPath))
         {

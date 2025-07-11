@@ -27,8 +27,10 @@ import static org.eclipse.jetty.toolchain.test.PathMatchers.isDirectory;
 import static org.eclipse.jetty.toolchain.test.PathMatchers.isRegularFile;
 import static org.eclipse.jetty.toolchain.test.PathMatchers.isSame;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MavenPathsTest
 {
@@ -124,6 +126,65 @@ public class MavenPathsTest
 
         Path file = MavenPaths.findMainResourceFile("META-INF/ignored/info.txt");
         assertThat("Main resource file", file, isRegularFile());
+    }
+
+    public static Stream<Arguments> invalidPathNameReferences()
+    {
+        return Stream.of(
+            Arguments.of(null, "must not be null"),
+            Arguments.of("", "must not be blank"),
+            Arguments.of("   ", "must not be blank"),
+            Arguments.of("\t", "must not be blank"),
+            Arguments.of("/etc/hosts", "must not start with slash")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPathNameReferences")
+    public void testFindMainResourceDirInvalid(String invalid, String expectedMessage)
+    {
+        AssertionError error = assertThrows(AssertionError.class, () -> MavenPaths.findMainResourceDir(invalid));
+        assertThat("AssertionError.message", error.getMessage(), containsString(expectedMessage));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPathNameReferences")
+    public void testFindMainResourceFileInvalid(String invalid, String expectedMessage)
+    {
+        AssertionError error = assertThrows(AssertionError.class, () -> MavenPaths.findMainResourceFile(invalid));
+        assertThat("AssertionError.message", error.getMessage(), containsString(expectedMessage));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPathNameReferences")
+    public void testFindTestResourceDirInvalid(String invalid, String expectedMessage)
+    {
+        AssertionError error = assertThrows(AssertionError.class, () -> MavenPaths.findTestResourceDir(invalid));
+        assertThat("AssertionError.message", error.getMessage(), containsString(expectedMessage));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPathNameReferences")
+    public void testFindTestResourceFileInvalid(String invalid, String expectedMessage)
+    {
+        AssertionError error = assertThrows(AssertionError.class, () -> MavenPaths.findTestResourceFile(invalid));
+        assertThat("AssertionError.message", error.getMessage(), containsString(expectedMessage));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPathNameReferences")
+    public void testProjectDirInvalid(String invalid, String expectedMessage)
+    {
+        AssertionError error = assertThrows(AssertionError.class, () -> MavenPaths.projectDir(invalid));
+        assertThat("AssertionError.message", error.getMessage(), containsString(expectedMessage));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPathNameReferences")
+    public void testProjectFileInvalid(String invalid, String expectedMessage)
+    {
+        AssertionError error = assertThrows(AssertionError.class, () -> MavenPaths.projectFile(invalid));
+        assertThat("AssertionError.message", error.getMessage(), containsString(expectedMessage));
     }
 
     public static Stream<Arguments> safeNameCases()
