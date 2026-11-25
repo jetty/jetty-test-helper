@@ -29,7 +29,7 @@
     <url>https://github.com/jetty/${jetty.git.repo}</url>
   </scm>
   <properties>
-    <jdk.version.minimum>11</jdk.version.minimum>
+    <jdk.version.minimum>17</jdk.version.minimum>
     <jetty.git.repo>jetty-test-helper</jetty.git.repo>
     <junit.version>5.13.4</junit.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
